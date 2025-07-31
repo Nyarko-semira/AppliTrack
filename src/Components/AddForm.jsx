@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 
-const AddForm = () => {
+const AddForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
     company: "",
     role: "",
@@ -14,17 +14,29 @@ const AddForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   console.log("Form Submitted:", formData);
+  // };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
+    onSubmit(formData);
+    setFormData({
+      company: "",
+      role: "",
+      status: "pending",
+      dateApplied: "",
+      notes: "",
+    });
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-1 bg-white shadow-lg p-2 rounded-lg max-w-xs mx-auto mt-1"
+      className="space-y-4 bg-white shadow-md p-6 rounded-xl w-full max-w-sm  mt-0"
     >
-      <div>
+      <div className="mb-1">
         <label className="block  font-sm text-xs">Company</label>
         <input
           type="text"
@@ -36,7 +48,7 @@ const AddForm = () => {
         />
       </div>
 
-      <div>
+      <div className="mb-1">
         <label className="block font-sm text-xs">Role</label>
         <input
           type="text"
@@ -48,7 +60,7 @@ const AddForm = () => {
         />
       </div>
 
-      <div>
+      <div className="mb-1">
         <label className="block mb-1 font-sm text-xs">Status</label>
         <select
           name="status"
@@ -63,7 +75,7 @@ const AddForm = () => {
         </select>
       </div>
 
-      <div>
+      <div className="mb-1">
         <label className="block font-sm text-xs">Date Applied</label>
         <input
           type="date"
@@ -74,7 +86,7 @@ const AddForm = () => {
         />
       </div>
 
-      <div>
+      <div className="mb-1">
         <label className="block  font-sm text-xs">Notes</label>
         <textarea
           name="notes"
