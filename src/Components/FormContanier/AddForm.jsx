@@ -14,10 +14,6 @@ const AddForm = ({ onSubmit }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   console.log("Form Submitted:", formData);
-  // };
 
   const handleSubmit = (e) => {
     e.preventDefault();

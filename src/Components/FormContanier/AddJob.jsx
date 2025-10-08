@@ -3,7 +3,7 @@ import AddForm from "./AddForm";
 import JobList from "./JobList";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 const AddJob = () => {
   const [applications, setApplications] = useState([]);
@@ -21,7 +21,7 @@ const AddJob = () => {
 
   // save to localStorage when there is a change
   const handleAdd = (newApp) => {
-    const  appId= { ...newApp, id:uuidv4() };
+    const appId = { ...newApp, id: uuidv4() };
     const updated = [...applications, appId];
     setApplications(updated);
     localStorage.setItem("jobApplications", JSON.stringify(updated)); // force-save

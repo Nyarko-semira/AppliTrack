@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
+import { AppContext } from "../Context/AppContext";
+import JobCard from "./JobCard";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -9,14 +11,8 @@ const statusColors = {
 };
 
 const Home = () => {
-  const [applications, setApplications] = useState([]);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("jobApplications");
-    if (stored) {
-      setApplications(JSON.parse(stored));
-    }
-  }, []);
+  const { jobs, applications, setJobs, setApplications } =
+    useContext(AppContext);
 
   return (
     <div className=" bg-gray-50">
@@ -55,43 +51,32 @@ const Home = () => {
         </div>
       </section>
 
-      {/* ✅ Recent Applications Section */}
+      {/* ✅ Recent Jobs Section */}
       <section className="max-w-7xl mx-auto px-4 py-10">
         <h2 className="text-xl font-semibold mb-4 text-gray-800">
-          📋 Recent Applications
+          📋 Recent Job Listing
         </h2>
+        {jobs.length > 0 ? (
+          <section className="m-10">
+            <div className="flex justify-between items-center mb-1">
+              <h2 className="text-xl font-semibold text-gray-700">
+                Jobs Posted
+              </h2>
+              <Link
+                to="/addjobs"
+                className="text-blue-600 hover:underline text-sm"
+              >
+                View all jobs →
+              </Link>
+            </div>
 
-        {applications.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {applications
-              .slice(-3)
-              .reverse()
-              .map((app, index) => (
-                <Link to={`/preview/${app.id}`} key={app.id}>
-                  <div
-                    key={index}
-                    className="bg-gray shadow-md rounded-xl p-4 text-left min-h-50"
-                  >
-                    <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                      {app.role}
-                    </h3>
-                    <p className="text-sm text-gray-500 mb-2">
-                      at {app.company}
-                    </p>
-                    <span
-                      className={`text-xs px-3 py-1 rounded-full ${
-                        statusColors[app.status]
-                      } inline-block`}
-                    >
-                      {app.status}
-                    </span>
-                    <p className="text-sm text-gray-400 mt-3">
-                      Applied on: {app.dateApplied || "Not specified"}
-                    </p>
-                  </div>
-                </Link>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+              {jobs.slice(0, 8).map((job) => (
+                // TODO: Turn this into a component
+                <JobCard key={job.id} job={job} from="home" />
               ))}
-          </div>
+            </div>
+          </section>
         ) : (
           <div className="bg-white text-center text-gray-500 py-12 rounded-xl shadow-md">
             <p className="text-lg font-medium mb-2">No applications yet.</p>
