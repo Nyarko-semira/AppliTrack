@@ -1,10 +1,13 @@
 import React, { useContext } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { AppContext } from "../Context/AppContext";
 import { Eye } from "lucide-react";
 
+
+
 const AllAddedApps = () => {
   const { applications, jobs } = useContext(AppContext);
+
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -29,14 +32,13 @@ const AllAddedApps = () => {
                 </p>
                 <p className="text-gray-500">{app.email}</p>
                 <p
-                  className={`mt-2 inline-block px-2 py-1 rounded text-sm ${
-                    {
+                  className={`mt-2 inline-block px-2 py-1 rounded text-sm ${{
                       pending: "bg-yellow-100 text-yellow-800",
                       interview: "bg-blue-100 text-blue-800",
                       offer: "bg-green-100 text-green-800",
                       rejected: "bg-red-100 text-red-800",
                     }[app.status]
-                  }`}
+                    }`}
                 >
                   {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
                 </p>

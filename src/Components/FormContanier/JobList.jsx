@@ -2,8 +2,8 @@ import React from "react";
 
 const JobList = ({ applications }) => {
   return (
-    <div className="mt-1 max-w-4xl mx-auto bg-white shadow rounded-lg overflow-hidden">
-      <div className="max-h-80 overflow-y-auto">
+    <div className="mt-1 w-full mx-auto bg-white shadow rounded-lg overflow-hidden">
+      <div className="max-h-80  min-h-64 overflow-y-auto">
         <table className="w-full table-auto text-sm">
           <thead className="bg-blue-50 text-left sticky top-0 z-10">
             <tr className=" cursor-pointer">

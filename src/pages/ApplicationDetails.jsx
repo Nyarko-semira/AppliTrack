@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { AppContext } from "../Context/AppContext";
+import toast from "react-hot-toast";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -11,7 +12,13 @@ const statusColors = {
 
 const ApplicationDetails = () => {
   const { id } = useParams();
-  const { applications, jobs } = useContext(AppContext);
+  const { applications, jobs, updateApplicationStatus } = useContext(AppContext);
+
+
+  const handleStatusChange = (id, newStatus) => {
+    updateApplicationStatus(id, newStatus);
+    toast.success(`Application status updated to "${newStatus}"!`);
+  };
 
   //  IDs must  be  strings
   const application = applications.find((app) => app.id === id);
@@ -23,9 +30,14 @@ const ApplicationDetails = () => {
 
   if (!application) {
     return (
-      <div className="p-6 text-center">
-        <h2 className="text-xl font-bold mb-4">Application not found</h2>
-        <Link to="/dashboard" className="text-blue-600 hover:underline">
+      <div className="p-4 sm:p-6 text-center">
+        <h2 className="text-lg sm:text-xl font-bold mb-4">
+          Application not found
+        </h2>
+        <Link
+          to="/dashboard"
+          className="text-blue-600 hover:underline text-sm sm:text-base"
+        >
           ← Back to Dashboard
         </Link>
       </div>
@@ -33,90 +45,102 @@ const ApplicationDetails = () => {
   }
 
   return (
-    <div className="p-8 max-w-2xl mx-auto bg-white rounded-2xl shadow-lg mt-8 border border-gray-200">
-      {/* Header */}
-      <div className="border-b pb-4 mb-6">
-        <h1 className="text-3xl font-bold text-blue-600">
+    <div className="p-4 sm:p-6 md:p-8 max-w-2xl mx-auto bg-white rounded-2xl shadow-lg mt-6 sm:mt-8 border border-gray-200">
+
+      <div className="border-b pb-0 sm:pb-2 mb-2 sm:mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 text-center sm:text-left">
           Application Details
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-gray-500 mt-1 text-sm sm:text-base text-center sm:text-left mb-0">
           Detailed information about the applicant
         </p>
       </div>
 
-      {/* Applicant Info */}
-      <div className="space-y-4 text-gray-700">
+
+      <div className="space-y-4 text-gray-700 text-sm sm:text-base">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-800">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 break-words text-center sm:text-left">
             {application.name}
           </h2>
-          <p className="text-sm text-gray-500">Applicant Name</p>
+          <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+            Applicant Name
+          </p>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
           <span className="font-medium">Email:</span>
-          <span className="text-gray-600">{application.email}</span>
+          <span className="text-gray-600 break-all">{application.email}</span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
           <span className="font-medium">Applied For:</span>
           <span className="text-gray-600">{job.title}</span>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
           <span className="font-medium">Applied On:</span>
           <span className="text-gray-600">{application.appliedDate}</span>
         </div>
 
-        {/* Coverletter */}
-        <div className="flex justify-between items-center">
-          <span className="font-medium">Cover Letter:</span>
-          {application.coverLetter ? (
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+          <span className="font-medium">Resume:</span>
+          {application?.resume?.url ? (
             <a
-              href={application.coverLetter.url}
+              href={application.resume.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:underline truncate"
             >
-              {application.coverLetter.fileName}
+              {application.resume.fileName}
             </a>
           ) : (
             <span className="text-gray-600">Not uploaded</span>
           )}
         </div>
 
-        <div className="flex justify-between items-center">
-          <span className="font-medium">Experience:</span>
-          <span className="text-gray-600">
-            {application.experience || "N/A"}
-          </span>
-        </div>
-
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
           <span className="font-medium">Skills:</span>
-          <span className="text-gray-600">
-            {application.skiils || "Not provided"}
+          <span className="text-gray-600 break-words">
+            {application.skills || "Not provided"}
           </span>
         </div>
 
-        <div className="flex justify-between items-center">
-          <span className="font-medium">Status:</span>
-          <span
-            className={`px-3 py-1 rounded-full font-semibold text-sm ${
-              statusColors[application.status]
-            }`}
-          >
-            {application.status.charAt(0).toUpperCase() +
-              application.status.slice(1)}
-          </span>
+        <div className="mb-4">
+          <span className="font-medium block mb-1">Cover Letter:</span>
+          {application.coverLetter ? (
+            <p className="whitespace-pre-wrap text-gray-800 bg-gray-50 p-3 rounded-md border border-gray-200 leading-relaxed text-sm sm:text-base overflow-auto max-h-60 sm:max-h-96">
+              {application.coverLetter}
+            </p>
+          ) : (
+            <span className="text-gray-600">Not uploaded</span>
+          )}
         </div>
+
+
+        <div className="mt-3  flex  justify-between items-center">
+          <label className="text-sm font-medium text-gray-700 mr-2">
+            Status:
+          </label>
+          <select
+            value={application.status}
+            onChange={(e) => handleStatusChange(application.id, e.target.value)}
+            className={`px-2 py-1 rounded text-sm border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 ${statusColors[application.status]}`}
+          >
+            <option value="pending">Pending</option>
+            <option value="interview">Interview</option>
+            <option value="offer">Offer</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+
+
       </div>
 
-      {/* Back Button */}
-      <div className="mt-8 text-right">
+
+      <div className="mt-6 sm:mt-8 text-center sm:text-right">
         <Link
           to="/dashboard"
-          className="inline-block bg-blue-600 text-white font-medium px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition"
+          className="inline-block bg-blue-600 text-white font-medium px-5 sm:px-6 py-2 rounded-lg shadow hover:bg-blue-700 transition text-sm sm:text-base"
         >
           ← Back to Dashboard
         </Link>

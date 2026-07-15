@@ -1,152 +1,199 @@
 import React, { useContext } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { AppContext } from "../Context/AppContext";
+import { Briefcase, MapPin, DollarSign, Clock, Calendar, ArrowLeft, Users, Mail, CheckCircle2 } from "lucide-react";
 
 const statusColors = {
-  pending: "bg-yellow-100 text-yellow-800",
-  interview: "bg-blue-100 text-blue-800",
-  offer: "bg-green-100 text-green-800",
-  rejected: "bg-red-100 text-red-800",
+  pending: "bg-amber-50 text-amber-800 border-amber-200",
+  interview: "bg-blue-50 text-blue-800 border-blue-200",
+  offer: "bg-emerald-50 text-emerald-800 border-emerald-200",
+  rejected: "bg-rose-50 text-rose-800 border-rose-200",
 };
 
 const JobDetail = () => {
-  const { id } = useParams(); // get job ID from URL
+  const { id } = useParams();
   const { jobs, applications } = useContext(AppContext);
   const location = useLocation();
   const fromPage = location.state?.from;
 
-  // Find the job that matches the ID
-  const job = jobs.find((job) => job.id === id);
-
-  //Filter applications  for this job
-  const jobApplications = applications.filter((application) => {
-    return application.jobId === id;
-  });
+  const job = jobs.find((j) => j.id === id);
+  const jobApplications = applications.filter((app) => app.jobId === id);
 
   if (!job) {
     return (
-      <div className="p-6 text-center">
-        <h2 className="text-xl font-bold mb-4">Job not found</h2>
-        <Link to="/dashboard" className="text-blue-600 hover:underline">
-          ← Back to Dashboard
-        </Link>
+      <div className="min-h-screen flex flex-col justify-center items-center p-6 bg-gray-50/50">
+        <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm text-center max-w-sm">
+          <h2 className="text-2xl font-display font-bold text-gray-800 mb-2">Job Not Found</h2>
+          <p className="text-gray-500 text-sm mb-6">The job you are trying to view does not exist or has been removed.</p>
+          <Link
+            to="/home"
+            className="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl shadow transition"
+          >
+            <ArrowLeft size={16} /> Return Home
+          </Link>
+        </div>
       </div>
     );
   }
 
+  const isCandidateView = fromPage === "home";
+
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-md mt-5">
-      <h1 className="text-2xl  border-b font-bold mb-2 text-blue-700">
-        {job.title}
-      </h1>
-      <p className="text-gray-600 mb-2">
-        {job.company || "Company not specified"}
-      </p>
-      <p className="text-gray-500 mb-2">
-        {job.location || "Location not specified"}
-      </p>
-      <p className="mb-2">
-        <strong>Department:</strong> {job.department || "N/A"}
-      </p>
-      <p className="mb-2">
-        <strong>Job Type:</strong> {job.type || "N/A"}
-      </p>
-      <p className="mb-2">
-        <strong>Salary:</strong> {job.salary || "N/A"}
-      </p>
-      <p className="mb-4">
-        <strong>Description:</strong>{" "}
-        {job.description || "No description provided"}
-      </p>
-      <p className="text-gray-400 text-sm mb-4">
-        Posted on:{" "}
-        {job.datePosted
-          ? new Date(job.datePosted).toDateString()
-          : "Date not available"}
-      </p>
-
-      {/* Status */}
-      {/* <div className="flex items-center gap-3">
-           
-            <span className="font-semibold text-gray-600">Status:</span>
-            <span
-              className={`px-3 py-1 text-xs font-medium rounded-full ${
-                statusColors[job.status]
-              }`}
-            >
-              {job.status}
-            </span>
-          </div> */}
-
-      {/* Application Section */}
-      {fromPage === "home" ? (
-        <></>
-      ) : (
-        <div className="bg-gray p-4 rounded-xl shadoow">
-          <h2 className="text-xl font-semibold mb-2">
-            Applicants ({jobApplications.length})
-          </h2>
-          {jobApplications.length === 0 ? (
-            <p className="text-gray-500">No applicants yet !</p>
-          ) : (
-            <ul className="space-y-2">
-              {jobApplications.map((app) => (
-                <li
-                  key={app.id}
-                  className="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm"
-                >
-                  <Link
-                    to={`/applications/${app.id}`}
-                    className="text-blue-600 "
-                  >
-                    <div>
-                      <p className="font-medium text-gray-800">{app.name}</p>
-                      <p className="text-sm text-gray-500">{app.email}</p>
-                    </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        statusColors[app.status]
-                      }`}
-                    >
-                      {app.status}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      {fromPage === "home" ? (
-        <div className="mt-10 flex justify-between align-items-center">
-          <div>
-            <Link
-              to={`/applyjob/${job.id}`}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-            >
-              Apply For Job
-            </Link>
-          </div>
-          <div>
-            <Link
-              to="/dashboard"
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-            >
-              ← Back to Home
-            </Link>
-          </div>
-        </div>
-      ) : (
-        <div className="mt-10 text-right">
+    <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 font-sans">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Back Link */}
+        <div className="mb-6">
           <Link
-            to="/dashboard"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            to={isCandidateView ? "/home" : "/dashboard"}
+            className="inline-flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-indigo-600 transition-colors group"
           >
-            ← Back to Dashboard
+            <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
+            Back to {isCandidateView ? "Home" : "Dashboard"}
           </Link>
         </div>
-      )}
+
+        {/* Layout Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Main Info (Left Col) */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
+              <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wider mb-4">
+                {job.department || "General"}
+              </span>
+              <h1 className="text-3xl font-display font-extrabold text-gray-800 tracking-tight leading-tight">
+                {job.title}
+              </h1>
+              
+              <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-sm text-gray-500 mt-4 border-b border-gray-100 pb-6">
+                <span className="font-semibold text-gray-700 text-base">{job.company}</span>
+                <span className="inline-flex items-center gap-1">
+                  <MapPin size={14} />
+                  {job.location || "Remote"}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Calendar size={14} />
+                  Posted {job.postedDate ? new Date(job.postedDate).toLocaleDateString() : "Recently"}
+                </span>
+              </div>
+
+              {/* Job Description */}
+              <div className="mt-6">
+                <h3 className="text-lg font-bold text-gray-800 mb-3">Job Description</h3>
+                <p className="text-gray-600 leading-relaxed whitespace-pre-line text-sm md:text-base">
+                  {job.description || "No description provided. Please reach out for more details."}
+                </p>
+              </div>
+            </div>
+
+            {/* Recruiter View: Applicants List */}
+            {!isCandidateView && (
+              <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+                  <h2 className="text-xl font-display font-extrabold text-gray-800 flex items-center gap-2">
+                    <Users size={20} className="text-indigo-600" />
+                    Applicants ({jobApplications.length})
+                  </h2>
+                </div>
+
+                {jobApplications.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-gray-500 text-sm">No applications have been submitted for this position yet.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {jobApplications.map((app) => (
+                      <div
+                        key={app.id}
+                        className="bg-gray-50 border border-gray-100 rounded-xl p-5 hover:border-indigo-100 hover:bg-white transition-all flex flex-col justify-between"
+                      >
+                        <div className="mb-4">
+                          <h4 className="font-bold text-gray-800 text-base leading-snug">{app.name}</h4>
+                          <span className="inline-flex items-center gap-1 text-gray-500 text-xs mt-1">
+                            <Mail size={12} />
+                            {app.email}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100/50">
+                          <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${statusColors[app.status] || "bg-gray-100 text-gray-700"}`}>
+                            {app.status}
+                          </span>
+                          <Link
+                            to={`/applications/${app.id}`}
+                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                          >
+                            Review Details →
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar Info (Right Col) */}
+          <div>
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-6 sticky top-24">
+              <h3 className="text-lg font-bold text-gray-800 border-b border-gray-100 pb-3">Job Overview</h3>
+              
+              <div className="space-y-4">
+                {/* Department */}
+                <div className="flex items-start gap-3 text-sm">
+                  <Briefcase className="text-indigo-500 mt-0.5" size={18} />
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Department</p>
+                    <p className="font-semibold text-gray-700 mt-0.5">{job.department || "Not Specified"}</p>
+                  </div>
+                </div>
+
+                {/* Job Type */}
+                <div className="flex items-start gap-3 text-sm">
+                  <Clock className="text-indigo-500 mt-0.5" size={18} />
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Job Type</p>
+                    <p className="font-semibold text-gray-700 mt-0.5">{job.type || "Full-time"}</p>
+                  </div>
+                </div>
+
+                {/* Salary */}
+                <div className="flex items-start gap-3 text-sm">
+                  <DollarSign className="text-indigo-500 mt-0.5" size={18} />
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Salary Range</p>
+                    <p className="font-semibold text-gray-700 mt-0.5">{job.salary || "Competitive"}</p>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="flex items-start gap-3 text-sm">
+                  <MapPin className="text-indigo-500 mt-0.5" size={18} />
+                  <div>
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Location</p>
+                    <p className="font-semibold text-gray-700 mt-0.5">{job.location || "Remote"}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons for Candidates */}
+              {isCandidateView && (
+                <div className="pt-4 border-t border-gray-100">
+                  <Link
+                    to={`/applyjob/${job.id}`}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    <CheckCircle2 size={18} />
+                    Apply For Job
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 };

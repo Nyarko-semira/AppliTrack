@@ -1,6 +1,6 @@
-import React, { useContext, useState } from "react";
-import jobsData from "../Components/Data/Jobs";
-import applicationsData from "../Components/Data/ApplicationsData";
+import React, { useContext} from "react";
+// import jobsData from "../Components/Data/Jobs";
+// import applicationsData from "../Components/Data/ApplicationsData";
 import { Briefcase, FileText, Users, Clock } from "lucide-react"; // icons
 import { Link } from "react-router-dom";
 import { AppContext } from "../Context/AppContext";
@@ -84,7 +84,7 @@ const HrDashboard = () => {
           <div className="flex justify-between items-center mb-1">
             <h2 className="text-xl font-semibold text-gray-700">Jobs Posted</h2>
             <Link
-              to="/addjobs"
+              to="/jobs"
               className="text-blue-600 hover:underline text-sm"
             >
               View all jobs →
@@ -93,7 +93,7 @@ const HrDashboard = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
             {jobs.slice(0, 8).map((job) => (
-              // TODO: Turn this into a component
+           
               <JobCard key={job.id} job={job} from="dashboard" />
             ))}
           </div>

@@ -27,9 +27,8 @@ function ApplicationCard({ applicationDetail }) {
       {/* Status  here */}
       <p>
         <span
-          className={`px-3 py-1 rounded-full text-sm font-semibold ${
-            statusColors[applicationDetail?.status]
-          }`}
+          className={`px-3 py-1 rounded-2 text-sm font-semibold text-center ${statusColors[applicationDetail?.status]
+            }`}
         >
           {applicationDetail?.status}
         </span>

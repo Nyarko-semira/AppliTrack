@@ -8,12 +8,13 @@ const applicationsData = [
     email: "natasha@example.com",
     appliedDate: "2025-08-29",
     status: "pending",
-    skiils:"React, Angular",
+    skills:"React, Angular",
     experience:"Senior",
-     coverLetter: {
-    fileName: "Natashia_CoverLetter.pdf",
-    url: "/uploads/cover-letters/Natashia_CoverLetter.pdf"
-  }
+     coverLetter: "this is my cover letter",
+        resume: {
+      fileName: "Natasha_Resume.pdf",
+      url: "/uploads/resumes/Natasha_Resume.pdf"
+    },
   },
   {
     id: "3",
@@ -24,10 +25,11 @@ const applicationsData = [
     status: "pending",
     skills:"React, Angular",
     experience:"Senior",
-     coverLetter: {
-    fileName: "Natashia_CoverLetter.pdf",
-    url: "/uploads/cover-letters/Natashia_CoverLetter.pdf"
-  }
+    resume: {
+      fileName: "Natashia_Resume.pdf",
+      url: "/uploads/resumes/Natashia_Resume.pdf"
+    },
+     coverLetter:"madam",
     
   },
   {
@@ -37,12 +39,13 @@ const applicationsData = [
     email: "kwame.m@example.com",
     appliedDate: "2025-08-30",
     status:"rejected",
-   skiils:"C# , Java",
+   skills:"C# , Java",
     experience:"Senior",
-     coverLetter: {
-    fileName: "Natashia_CoverLetter.pdf",
-    url: "/uploads/cover-letters/Natashia_CoverLetter.pdf"
-  }
+     coverLetter: "hello sir",
+       resume: {
+      fileName: "Natashia_Resume.pdf",
+      url: "/uploads/resumes/Natashia_Resume.pdf"
+    },
 
   },
   {
@@ -52,12 +55,14 @@ const applicationsData = [
     email: "akosua.addo@example.com",
     appliedDate: "2025-08-31",
     status:"offer", 
-    skiils:"Figma, Adobe",
+    skills:"Figma, Adobe",
     experience:"Senior",
-    coverLetter: {
-    fileName: "Natashia_CoverLetter.pdf",
-    url: "/uploads/cover-letters/Natashia_CoverLetter.pdf"
-  }
+    coverLetter: "hello sir",
+        resume: { 
+      fileName: "Natashia_Resume.pdf",
+          
+      url: "/uploads/resumes/Natashia_Resume.pdf"
+    },
   },
 ];
 

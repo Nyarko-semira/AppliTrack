@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { AppContext } from "../Context/AppContext";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const ApplyJobForm = () => {
   const { addApplication, jobs } = useContext(AppContext);
@@ -17,10 +18,7 @@ const ApplyJobForm = () => {
     reset,
   } = useForm();
 
-  //   const handleApply = (data) => {
-  //     console.log("Form submitted:", data);
-  //     alert("Application submitted successfully!");
-  //   };
+
 
   const onSubmit = (data) => {
     const newApplication = {
@@ -28,19 +26,45 @@ const ApplyJobForm = () => {
       ...data,
       jobId: id,
       status: "pending",
-      appliedDate: new Date().toISOString().split("T")[0], // YYYY-MM-DD format
+      appliedDate: new Date().toISOString().split("T")[0], 
+      resume: {
+        fileName: data.resume[0]?.name || "No file uploaded",
+        url: URL.createObjectURL(data.resume[0]),
+      },
+      coverLetter: data.coverLetter,
     };
+    
+   
     addApplication(newApplication);
-    alert("Application submitted successfully!");
+
+    // 2. Automatically sync to Candidate's manual local tracker (localStorage)
+    try {
+      const stored = localStorage.getItem("jobApplications");
+      const localTrackerApps = stored ? JSON.parse(stored) : [];
+      const trackerEntry = {
+        id: newApplication.id,
+        company: jobb?.company || "Unknown Company",
+        role: jobb?.title || "Unknown Role",
+        status: "pending",
+        dateApplied: newApplication.appliedDate,
+        notes: `Applied directly via AppliTrack platform. Resume submitted: ${newApplication.resume.fileName}`,
+      };
+      localTrackerApps.push(trackerEntry);
+      localStorage.setItem("jobApplications", JSON.stringify(localTrackerApps));
+    } catch (e) {
+      console.error("Error syncing application to candidate tracker", e);
+    }
+
+    toast.success("Application submitted successfully!");
     console.log("Form submitted:", data);
     reset();
-    navigate("/");
+    navigate("/home");
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-2xl mx-auto bg-white shadow-md rounded-xl p-6 space-y-1 mt-5"
+      className="max-w-3xl mx-auto bg-white shadow-md rounded-xl p-6 space-y-1 mt-5 h-full"
     >
       <div className="text-center mb-4">
         <h2 className="text-2xl font-bold text-gray-800">
@@ -86,6 +110,7 @@ const ApplyJobForm = () => {
         <label className="block text-sm font-medium mb-1">Resume</label>
         <input
           type="file"
+          accept=".pdf,.doc,.docx"
           {...register("resume", { required: true })}
           className={`w-full border p-2 rounded-md focus:outline-none 
             ${errors.resume ? "border-red-500" : "border-gray-300"}`}
@@ -99,7 +124,7 @@ const ApplyJobForm = () => {
           rows="4"
           className={`w-full border p-2 rounded-md focus:outline-none 
             ${errors.coverLetter ? "border-red-500" : "border-gray-300"}`}
-          placeholder="Write your cover letter"
+          placeholder="cover letter, not more than 150 words"
         ></textarea>
       </div>
 

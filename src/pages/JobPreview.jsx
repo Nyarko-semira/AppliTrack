@@ -30,7 +30,7 @@ const JobPreview = () => {
           The job you’re looking for doesn’t exist.
         </p>
         <Link
-          to="/"
+          to="/home"
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
         >
           <ArrowLeft size={16} /> Back to Home
@@ -84,7 +84,7 @@ const JobPreview = () => {
         {/* Back Button */}
         <div className="mt-10 text-right">
           <Link
-            to="/"
+            to="/home"
             className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium"
           >
             <ArrowLeft size={16} /> Back to Dashboard

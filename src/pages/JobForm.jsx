@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { AppContext } from "../Context/AppContext";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const JobForm = () => {
   const { register, handleSubmit, reset } = useForm();
@@ -15,13 +16,14 @@ const JobForm = () => {
       datePosted: new Date().toISOString(),
     };
     addJob(newJob); // add job to global state
+    toast.success("New job opening posted successfully!");
     reset();
     navigate("/dashboard");
   };
 
   return (
     <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-md mt-5">
-      <h2 className="text-xl font-semibold mb-4">Add New Job</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">Add New Job</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
