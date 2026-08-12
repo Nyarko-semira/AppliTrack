@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import jobsData from "../Components/Data/Jobs";
 import applicationsData from "../Components/Data/ApplicationsData";
-import {AppContext} from "./AppContext"
+import { AppContext } from "./AppContext"
 
 
 export const AppProvider = ({ children }) => {
@@ -12,7 +12,7 @@ export const AppProvider = ({ children }) => {
 
   const [show, setShow] = useState({
     password: false,
-    confirmPaassword: false
+    confirmPassword: false
   })
 
   const [applications, setApplications] = useState(() => {
