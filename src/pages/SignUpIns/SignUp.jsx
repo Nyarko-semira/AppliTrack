@@ -11,7 +11,6 @@ const SignUp = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "",
   });
   const [error, setError] = useState("");
 
@@ -23,7 +22,7 @@ const SignUp = () => {
     e.preventDefault();
     setError("");
 
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword || !formData.role) {
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError("Please fill in all fields.");
       return;
     }
@@ -48,7 +47,6 @@ const SignUp = () => {
       name: formData.name,
       email: formData.email,
       password: formData.password,
-      role: formData.role,
     };
     existingUsers.push(newUser);
     localStorage.setItem("applitrack_users", JSON.stringify(existingUsers));
@@ -95,21 +93,6 @@ const SignUp = () => {
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
               placeholder="serwa@gmail.com"
             />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Role</label>
-
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-400 outline-none"
-            >
-              <option value="">Select your role</option>
-              <option value="user">User</option>
-              <option value="hr">Hr</option>
-            </select>
           </div>
 
           <div className="relative">

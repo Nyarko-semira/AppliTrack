@@ -3,7 +3,7 @@ import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./Components/Header/Navbar";
 import Home from "./pages/Home";
-import AddJob from "./Components/FormContanier/AddJob";
+// import AddJob from "./Components/FormContanier/AddJob";
 import Footer from "./Components/Footer/Footer";
 import JobPreview from "./pages/JobPreview";
 import AllJob from "./pages/AllJob";
@@ -43,7 +43,7 @@ const App = () => {
 
           {/* Main App Routes */}
           <Route path="/home" element={<Home />} />
-          <Route path="/add" element={<AddJob />} />
+          {/* <Route path="/add" element={<AddJob />} /> */}
           <Route path="/preview/:id" element={<JobPreview />} />
           <Route path="/all-jobs" element={<AllJob />} />
           <Route path="/dashboard" element={<HrDashboard />} />

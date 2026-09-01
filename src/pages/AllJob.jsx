@@ -84,11 +84,11 @@ const AllJob = () => {
               Manage and track jobs you have applied to across the web
             </p>
           </div>
-          <Link to="/add">
+          {/* <Link to="/add">
             <button className="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-3 rounded-xl shadow transition duration-300 hover:scale-[1.02] active:scale-[0.98]">
               <Plus size={16} /> Track New Job
             </button>
-          </Link>
+          </Link> */}
         </div>
 
         {/* Filter Toolbar (Search + Status Tabs) */}
