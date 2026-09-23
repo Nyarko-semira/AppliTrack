@@ -1,5 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { loginUser } from "../../api/authApi";
 import { AppContext } from "../../Context/AppContext";
 import toast from "react-hot-toast";
 
@@ -8,6 +10,36 @@ const SignIn = () => {
   const { show, setShow } = useContext(AppContext);
   const [formData, setFormData] = useState({ email: "", password: "", });
   const [error, setError] = useState("");
+
+const loginMutation = useMutation({
+  mutationFn: loginUser,
+
+  onSuccess: (data) => {
+    console.log("Login successful:", data);
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("role", data.user.role);
+    localStorage.setItem(
+      "currentUser",
+      JSON.stringify(data.user)
+    );
+
+    toast.success(`Welcome back, ${data.user.name}!`);
+
+    if (data.user.role === "HR") {
+      navigate("/dashboard");
+    } else {
+      navigate("/home");
+    }
+  },
+
+  onError: (error) => {
+    setError(
+      error.response?.data?.message ||
+      "Invalid email or password."
+    );
+  },
+});
 
   const role = localStorage.getItem("role");
 
@@ -23,6 +55,8 @@ const SignIn = () => {
       setError("Please fill in all fields.");
       return;
     }
+
+    loginMutation.mutate(formData);
 
     const existingUsersJSON = localStorage.getItem("applitrack_users");
     const existingUsers = existingUsersJSON ? JSON.parse(existingUsersJSON) : [];

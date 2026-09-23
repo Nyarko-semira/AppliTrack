@@ -1,4 +1,6 @@
 import React, { useContext } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createJob } from "../api/jobApi";
 import { useForm } from "react-hook-form";
 import { AppContext } from "../Context/AppContext";
 import { useNavigate } from "react-router-dom";
@@ -9,20 +11,32 @@ const JobForm = () => {
   const { addJob } = useContext(AppContext); // get global addJob
   const navigate = useNavigate();
 
+  const queryClient = useQueryClient();
+
+  const createJobMutation = useMutation({
+    mutationFn: createJob,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["jobs"],
+      });
+
+      toast.success("Job added successfully");
+      reset();
+      navigate("/dashboard");
+    },
+
+    onError: () => {
+      toast.error("Failed to add job");
+    },
+  });
+
   const onSubmit = (data) => {
-    const newJob = {
-      id: Date.now().toString(),
-      ...data,
-      datePosted: new Date().toISOString(),
-    };
-    addJob(newJob); // add job to global state
-    toast.success("New job opening posted successfully!");
-    reset();
-    navigate("/dashboard");
+    createJobMutation.mutate(data);
   };
 
   return (
-    <div className="max-w-lg mx-auto bg-white p-6 rounded-xl shadow-md mt-5">
+    <div className="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-md mt-15 ">
       <h2 className="text-2xl font-bold mb-4 text-center">Add New Job</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -67,7 +81,7 @@ const JobForm = () => {
           <div className="flex-1">
             <label className=" font-medium">Job Type</label>
             <select
-              {...register("type")}
+              {...register("jobType")}
               className="w-full border p-1 rounded focus:outline-blue-500"
             >
               <option>Full-time</option>

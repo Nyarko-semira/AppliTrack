@@ -1,15 +1,29 @@
-import React, { useContext } from "react";
-import { useParams } from "react-router-dom";
+import React from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getJobById } from "../api/jobApi";
+import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { AppContext } from "../Context/AppContext";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { applyForJob } from "../api/applicationApi";
 
 const ApplyJobForm = () => {
-  const { addApplication, jobs } = useContext(AppContext);
   const { id } = useParams(); // get job ID from URL
-  const jobb = jobs.find((job) => job.id === id);
+  const { data: job, isError, isLoading } = useQuery({ queryKey: ["job", id], queryFn: () => getJobById(id) });
   const navigate = useNavigate();
+
+
+  if (isError) {
+    toast.error("Something went wrong.Please try again later.");
+    navigate("/home");
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   const {
     register,
@@ -18,48 +32,38 @@ const ApplyJobForm = () => {
     reset,
   } = useForm();
 
-
-
-  const onSubmit = (data) => {
-    const newApplication = {
-      id: Date.now().toString(),
-      ...data,
-      jobId: id,
-      status: "pending",
-      appliedDate: new Date().toISOString().split("T")[0], 
-      resume: {
-        fileName: data.resume[0]?.name || "No file uploaded",
-        url: URL.createObjectURL(data.resume[0]),
-      },
-      coverLetter: data.coverLetter,
-    };
-    
-   
-    addApplication(newApplication);
-
-    // 2. Automatically sync to Candidate's manual local tracker (localStorage)
-    try {
-      const stored = localStorage.getItem("jobApplications");
-      const localTrackerApps = stored ? JSON.parse(stored) : [];
-      const trackerEntry = {
-        id: newApplication.id,
-        company: jobb?.company || "Unknown Company",
-        role: jobb?.title || "Unknown Role",
-        status: "pending",
-        dateApplied: newApplication.appliedDate,
-        notes: `Applied directly via AppliTrack platform. Resume submitted: ${newApplication.resume.fileName}`,
-      };
-      localTrackerApps.push(trackerEntry);
-      localStorage.setItem("jobApplications", JSON.stringify(localTrackerApps));
-    } catch (e) {
-      console.error("Error syncing application to candidate tracker", e);
-    }
-
+  const applyMutation = useMutation({
+  mutationFn: applyForJob,
+  onSuccess: () => {
     toast.success("Application submitted successfully!");
-    console.log("Form submitted:", data);
     reset();
     navigate("/home");
+  },
+  onError: (error) => {
+    console.error("Application submission failed:", error);
+
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to submit application. Please try again."
+    );
+  },
+});
+
+
+
+ const onSubmit = async (data) => {
+  const applicationData = {
+    skills: data.skills,
+    resumeUrl: data.resume[0]?.name || "",
+    resumeFileName: data.resume[0]?.name || "No file uploaded",
+    coverLetter: data.coverLetter,
   };
+
+  await applyMutation.mutateAsync({
+    jobId: id,
+    applicationData,
+  });
+};
 
   return (
     <form
@@ -68,7 +72,7 @@ const ApplyJobForm = () => {
     >
       <div className="text-center mb-4">
         <h2 className="text-2xl font-bold text-gray-800">
-          Apply for this <span className="text-blue-500"> {jobb.title} </span>
+          Apply for this <span className="text-blue-500"> {job.title} </span>
         </h2>
         <p className="text-sm text-gray-500">
           Fill out the form below to submit your application

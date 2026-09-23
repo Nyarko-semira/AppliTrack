@@ -1,14 +1,31 @@
-import React, { useContext} from "react";
-// import jobsData from "../Components/Data/Jobs";
-// import applicationsData from "../Components/Data/ApplicationsData";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getHrApplications } from "../api/applicationApi";
+import { getHrJobs } from "../api/jobApi";
 import { Briefcase, FileText, Users, Clock } from "lucide-react"; // icons
 import { Link } from "react-router-dom";
-import { AppContext } from "../Context/AppContext";
 import ApplicationCard from "./ApplicationCard";
 import JobCard from "./JobCard";
 
 const HrDashboard = () => {
-  const { jobs, applications } = useContext(AppContext);
+  const { data: jobs, isLoading, isError } = useQuery({
+    queryKey: ["hrJobs"],
+    queryFn: getHrJobs,
+  });
+
+  const {
+    data: applications = [], isLoading: applicationsLoading, isError: applicationsError, } = useQuery({
+      queryKey: ["hrApplications"],
+      queryFn: getHrApplications,
+    });
+
+  if (isLoading || applicationsLoading) {
+    return <div>Loading dashboard...</div>;
+  }
+
+  if (isError || applicationsError) {
+    return <div>Failed to load dashboard data.</div>;
+  }
 
   // Stats
   const totalJobs = jobs.length;
@@ -84,7 +101,7 @@ const HrDashboard = () => {
           <div className="flex justify-between items-center mb-1">
             <h2 className="text-xl font-semibold text-gray-700">Jobs Posted</h2>
             <Link
-              to="/jobs"
+              to="/hr-jobs"
               className="text-blue-600 hover:underline text-sm"
             >
               View all jobs →
@@ -92,10 +109,12 @@ const HrDashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
-            {jobs.slice(0, 8).map((job) => (
-           
-              <JobCard key={job.id} job={job} from="dashboard" />
-            ))}
+            {jobs
+              .filter((job) => job.status === "OPEN")
+              .slice(0, 8)
+              .map((job) => (
+                <JobCard key={job.id} job={job} from="dashboard" />
+              ))}
           </div>
         </section>
 

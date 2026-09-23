@@ -1,5 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { registerUser } from "../../api/authApi";
 import { AppContext } from "../../Context/AppContext";
 import toast from "react-hot-toast";
 
@@ -14,47 +16,51 @@ const SignUp = () => {
   });
   const [error, setError] = useState("");
 
+const registerMutation = useMutation({
+  mutationFn: registerUser,
+
+  onSuccess: () => {
+    toast.success("Account created successfully! Please sign in.");
+    navigate("/signin");
+  },
+
+  onError: (error) => {
+    setError(
+      error.response?.data?.message || "Registration failed. Please try again."
+    );
+  },
+});
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
-      setError("Please fill in all fields.");
-      return;
-    }
+  if (
+    !formData.name ||
+    !formData.email ||
+    !formData.password ||
+    !formData.confirmPassword
+  ) {
+    setError("Please fill in all fields.");
+    return;
+  }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+  if (formData.password !== formData.confirmPassword) {
+    setError("Passwords do not match.");
+    return;
+  }
 
-    const existingUsersJSON = localStorage.getItem("applitrack_users");
-    const existingUsers = existingUsersJSON ? JSON.parse(existingUsersJSON) : [];
-
-    const userExists = existingUsers.some(
-      (user) => user.email.toLowerCase() === formData.email.toLowerCase()
-    );
-    if (userExists) {
-      setError("Email is already registered. Please sign in.");
-      return;
-    }
-
-    const newUser = {
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-    };
-    existingUsers.push(newUser);
-    localStorage.setItem("applitrack_users", JSON.stringify(existingUsers));
-
-    console.log("User registered successfully:", newUser);
-    toast.success("Account created successfully! Please sign in.");
-    navigate("/signin");
-  };
+  registerMutation.mutate({
+    name: formData.name,
+    email: formData.email,
+    password: formData.password,
+    role: formData.role,
+  });
+};
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">

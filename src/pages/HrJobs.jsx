@@ -1,20 +1,30 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getJobs } from "../api/jobApi"
+import { getHrJobs } from "../api/jobApi";
 import { Link } from "react-router-dom";
 import { Eye, MapPin, Clock, Briefcase } from "lucide-react";
 
-const ActiveJobs = () => {
+const HrJobs = () => {
     const { data: jobs, isLoading, isError } = useQuery({
-        queryKey: ["jobs"],
-        queryFn: getJobs
+        queryKey: ["hrJobs"],
+        queryFn: getHrJobs,
     });
 
-    if (isLoading) return <h1 className="text-3xl font-display font-extrabold text-gray-800 mb-2 text-center">Loading...</h1>
+    if (isLoading) {
+        return (
+            <h1 className="text-3xl font-display font-extrabold text-gray-800 mb-2 text-center">
+                Loading...
+            </h1>
+        );
+    }
 
-    if (isError) return <h1 className="text-3xl font-display font-extrabold text-gray-800 mb-2 text-center">Failed to load the page</h1>
-
-    const role = localStorage.getItem("role");
+    if (isError) {
+        return (
+            <h1 className="text-3xl font-display font-extrabold text-gray-800 mb-2 text-center">
+                Failed to load the page
+            </h1>
+        );
+    }
 
     const colors = [
         "bg-blue-50 text-blue-600 border-blue-100",
@@ -35,9 +45,8 @@ const ActiveJobs = () => {
                 </h1>
 
                 <p className="text-gray-500 text-sm mb-8">
-                    Browse available job opportunities across the organization.
+                    View all jobs posted across the organization.
                 </p>
-
 
                 {jobs.length === 0 ? (
 
@@ -48,7 +57,7 @@ const ActiveJobs = () => {
                         />
 
                         <h3 className="font-bold text-gray-700">
-                            No Jobs Available
+                            No Jobs Posted
                         </h3>
 
                         <p className="text-sm text-gray-500">
@@ -56,10 +65,10 @@ const ActiveJobs = () => {
                         </p>
                     </div>
 
-
                 ) : (
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+
                         {jobs.map((job) => {
 
                             const firstLetter =
@@ -70,23 +79,23 @@ const ActiveJobs = () => {
                             const colorIndex =
                                 (job.company || "").length % colors.length;
 
-
                             return (
 
                                 <div
                                     key={job.id}
                                     className="
-                    bg-white 
-                    rounded-2xl 
-                    border border-gray-100 
-                    p-6 
-                    shadow-sm 
-                    hover:shadow-md 
-                    transition-all 
-                    flex 
-                    flex-col 
-                    justify-between">
-
+                                        bg-white
+                                        rounded-2xl
+                                        border border-gray-100
+                                        p-6
+                                        shadow-sm
+                                        hover:shadow-md
+                                        transition-all
+                                        flex
+                                        flex-col
+                                        justify-between
+                                    "
+                                >
 
                                     {/* Job Information */}
                                     <div>
@@ -95,15 +104,14 @@ const ActiveJobs = () => {
 
                                             <div
                                                 className={`
-                w-11 h-11 rounded-xl
-                flex items-center justify-center
-                font-bold border
-                ${colors[colorIndex]}
-                `}
+                                                    w-11 h-11 rounded-xl
+                                                    flex items-center justify-center
+                                                    font-bold border
+                                                    ${colors[colorIndex]}
+                                                `}
                                             >
                                                 {firstLetter}
                                             </div>
-
 
                                             <div>
 
@@ -119,8 +127,6 @@ const ActiveJobs = () => {
 
                                         </div>
 
-
-
                                         {/* Details */}
                                         <div className="space-y-2 text-sm text-gray-600">
 
@@ -131,7 +137,6 @@ const ActiveJobs = () => {
                                                 </div>
                                             )}
 
-
                                             {job.jobType && (
                                                 <div className="flex items-center gap-2">
                                                     <Clock size={14} />
@@ -141,29 +146,32 @@ const ActiveJobs = () => {
 
                                         </div>
 
-
-
-                                        <span className="
-                                        inline-block
-                                        mt-4
-                                        px-3 py-1
-                                        text-xs
-                                        font-semibold
-                                        rounded-full
-                                        bg-indigo-50
-                                        text-indigo-600
-                                        "
+                                        {/* Department */}
+                                        <span
+                                            className="
+                                                inline-block
+                                                mt-4
+                                                px-3 py-1
+                                                text-xs
+                                                font-semibold
+                                                rounded-full
+                                                bg-indigo-50
+                                                text-indigo-600
+                                            "
                                         >
                                             {job.department || "General"}
                                         </span>
 
+                                        {/* Job Status */}
                                         <span
                                             className={`inline-block mt-3 px-3 py-1 text-xs font-semibold rounded-full ${job.status === "OPEN"
-                                                ? "bg-green-50 text-green-600"
-                                                : "bg-red-50 text-red-600"}`}
+                                                    ? "bg-green-50 text-green-600"
+                                                    : "bg-red-50 text-red-600"
+                                                }`}
                                         >
                                             {job.status}
                                         </span>
+
                                     </div>
 
                                     {/* Action */}
@@ -171,15 +179,15 @@ const ActiveJobs = () => {
 
                                         <Link
                                             to={`/Jobpreview/${job.id}`}
+                                            state={{ from: "hr-jobs" }}
                                             className="
                                                 flex items-center gap-1
                                                 text-indigo-600
                                                 hover:text-indigo-700
                                                 font-semibold
                                                 text-sm
-                                                "
+                                            "
                                         >
-
                                             <Eye size={14} />
 
                                             <span>
@@ -190,15 +198,12 @@ const ActiveJobs = () => {
 
                                     </div>
 
-
                                 </div>
 
                             );
-
                         })}
 
                     </div>
-
                 )}
 
             </div>
@@ -207,5 +212,4 @@ const ActiveJobs = () => {
     );
 };
 
-
-export default ActiveJobs;
+export default HrJobs;

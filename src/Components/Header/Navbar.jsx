@@ -24,12 +24,25 @@ const Navbar = () => {
       <div className=" mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
 
         {/* Logo */}
-        <Link
-          to="/"
-          className="text-xl font-display font-extrabold text-indigo-600 tracking-tight flex items-center gap-1.5 hover:opacity-90 transition-opacity"
-        >
-          🛤️ <span>AppliTrack</span>
-        </Link>
+        {role === "user" && (
+  <Link
+    to="/home"
+    className="text-xl font-display font-extrabold text-indigo-600 tracking-tight flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+  >
+    🛤️ <span>AppliTrack</span>
+  </Link>
+)}
+
+{role === "HR" && (
+  <Link
+    to="/dashboard"
+    className="text-xl font-display font-extrabold text-indigo-600 tracking-tight flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+  >
+    🛤️ <span>AppliTrack</span>
+  </Link>
+)}
+
+
 
         {/* Mobile Toggle Button */}
         <button

@@ -18,6 +18,7 @@ import SignIn from "./pages/SignUpIns/SignIn";
 import SignUp from "./pages/SignUpIns/SignUp";
 import { Toaster } from "react-hot-toast";
 import ActiveJobs from "./pages/AllActivejobs";
+import HrJobs from "./pages/HrJobs";
 
 
 const App = () => {
@@ -45,6 +46,7 @@ const App = () => {
           <Route path="/home" element={<Home />} />
           {/* <Route path="/add" element={<AddJob />} /> */}
           <Route path="/preview/:id" element={<JobPreview />} />
+          <Route path="/hr-jobs" element={<HrJobs />} />
           <Route path="/all-jobs" element={<AllJob />} />
           <Route path="/dashboard" element={<HrDashboard />} />
           <Route path="/addHr" element={<JobForm />} />

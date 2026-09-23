@@ -1,13 +1,26 @@
-import React, { useContext } from "react";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getJobs } from "../api/jobApi";
 import { Link } from "react-router-dom";
-import { AppContext } from "../Context/AppContext";
 import { Eye, MapPin, Briefcase, Clock, Users, ArrowRight } from "lucide-react";
 
 const AllAddedJob = () => {
-  const { jobs } = useContext(AppContext);
+  const {data: jobs = [], isLoading, isError,} = useQuery({
+  queryKey: ["jobs"],
+  queryFn: getJobs,
+});
+
+if (isLoading) {
+  return <div>Loading jobs...</div>;
+}
+
+if (isError) {
+  return <div>Failed to load jobs.</div>;
+}
+
   const role = localStorage.getItem("role");
 
-  // Logo colors matching other pages
+  
   const colors = [
     "bg-blue-50 text-blue-600 border-blue-100",
     "bg-indigo-50 text-indigo-600 border-indigo-100",

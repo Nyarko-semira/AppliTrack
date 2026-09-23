@@ -1,25 +1,72 @@
-import React, { useContext } from "react";
+import React from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getJobById, closeJob } from "../api/jobApi";
+import { getHrApplications } from "../api/applicationApi";
 import { useParams, Link, useLocation } from "react-router-dom";
-import { AppContext } from "../Context/AppContext";
 import { Briefcase, MapPin, DollarSign, Clock, Calendar, ArrowLeft, Users, Mail, CheckCircle2 } from "lucide-react";
 
 const statusColors = {
-  pending: "bg-amber-50 text-amber-800 border-amber-200",
-  interview: "bg-blue-50 text-blue-800 border-blue-200",
-  offer: "bg-emerald-50 text-emerald-800 border-emerald-200",
-  rejected: "bg-rose-50 text-rose-800 border-rose-200",
+  PENDING: "bg-amber-50 text-amber-800 border-amber-200",
+  INTERVIEW: "bg-blue-50 text-blue-800 border-blue-200",
+  OFFER: "bg-emerald-50 text-emerald-800 border-emerald-200",
+  REJECTED: "bg-rose-50 text-rose-800 border-rose-200",
 };
 
 const JobDetail = () => {
   const { id } = useParams();
-  const { jobs, applications } = useContext(AppContext);
   const location = useLocation();
   const fromPage = location.state?.from;
 
-  const job = jobs.find((j) => j.id === id);
-  const jobApplications = applications.filter((app) => app.jobId === id);
+  const role = localStorage.getItem("role");
+  const isHr = role === "HR";
 
-  if (!job) {
+  const queryClient = useQueryClient();
+
+  const closeJobMutation = useMutation({
+    mutationFn: closeJob,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["job", id],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["jobs"],
+      });
+    },
+  });
+
+  const { data: job, isLoading, isError, } = useQuery({
+    queryKey: ["job", id],
+    queryFn: () => getJobById(id),
+  });
+
+  const {
+    data: applications = [],
+    isLoading: applicationsLoading,
+    isError: applicationsError,
+  } = useQuery({
+    queryKey: ["hrApplications"],
+    queryFn: getHrApplications,
+    enabled: isHr,
+  });
+
+
+  if (isLoading || applicationsLoading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-500">Loading job details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const jobApplications = applications.filter(
+    (app) => String(app.jobId) === String(id)
+  );
+
+  if (isError || !job) {
     return (
       <div className="min-h-screen flex flex-col justify-center items-center p-6 bg-gray-50/50">
         <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm text-center max-w-sm">
@@ -41,7 +88,7 @@ const JobDetail = () => {
   return (
     <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 font-sans">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Back Link */}
         <div className="mb-6">
           <Link
@@ -55,7 +102,7 @@ const JobDetail = () => {
 
         {/* Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Main Info (Left Col) */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
@@ -65,7 +112,7 @@ const JobDetail = () => {
               <h1 className="text-3xl font-display font-extrabold text-gray-800 tracking-tight leading-tight">
                 {job.title}
               </h1>
-              
+
               <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-sm text-gray-500 mt-4 border-b border-gray-100 pb-6">
                 <span className="font-semibold text-gray-700 text-base">{job.company}</span>
                 <span className="inline-flex items-center gap-1">
@@ -74,7 +121,7 @@ const JobDetail = () => {
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <Calendar size={14} />
-                  Posted {job.postedDate ? new Date(job.postedDate).toLocaleDateString() : "Recently"}
+                  Posted {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : "Recently"}
                 </span>
               </div>
 
@@ -86,6 +133,28 @@ const JobDetail = () => {
                 </p>
               </div>
             </div>
+
+            {/* HR Status Control */}
+            {isHr && (
+              <div className="pt-4 border-t border-gray-100">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+                  Job Status
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => closeJobMutation.mutate(id)}
+                  disabled={closeJobMutation.isPending || job.status === "CLOSED"}
+                  className="w-full bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 font-semibold py-3 px-4 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {closeJobMutation.isPending
+                    ? "Closing..."
+                    : job.status === "CLOSED"
+                      ? "Job Closed"
+                      : "Close Job"}
+                </button>
+              </div>
+            )}
 
             {/* Recruiter View: Applicants List */}
             {!isCandidateView && (
@@ -109,10 +178,10 @@ const JobDetail = () => {
                         className="bg-gray-50 border border-gray-100 rounded-xl p-5 hover:border-indigo-100 hover:bg-white transition-all flex flex-col justify-between"
                       >
                         <div className="mb-4">
-                          <h4 className="font-bold text-gray-800 text-base leading-snug">{app.name}</h4>
+                          <h4 className="font-bold text-gray-800 text-base leading-snug">{app.applicant?.name}</h4>
                           <span className="inline-flex items-center gap-1 text-gray-500 text-xs mt-1">
                             <Mail size={12} />
-                            {app.email}
+                            {app.applicant?.email}
                           </span>
                         </div>
                         <div className="flex items-center justify-between pt-3 border-t border-gray-100/50">
@@ -132,13 +201,15 @@ const JobDetail = () => {
                 )}
               </div>
             )}
+
+
           </div>
 
           {/* Sidebar Info (Right Col) */}
           <div>
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-6 sticky top-24">
               <h3 className="text-lg font-bold text-gray-800 border-b border-gray-100 pb-3">Job Overview</h3>
-              
+
               <div className="space-y-4">
                 {/* Department */}
                 <div className="flex items-start gap-3 text-sm">
@@ -154,7 +225,7 @@ const JobDetail = () => {
                   <Clock className="text-indigo-500 mt-0.5" size={18} />
                   <div>
                     <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Job Type</p>
-                    <p className="font-semibold text-gray-700 mt-0.5">{job.type || "Full-time"}</p>
+                    <p className="font-semibold text-gray-700 mt-0.5">{job.jobType || "Full-time"}</p>
                   </div>
                 </div>
 
