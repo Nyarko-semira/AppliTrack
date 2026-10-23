@@ -1,79 +1,87 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Eye, Search, Trash2, Calendar, SlidersHorizontal, Plus, Briefcase } from "lucide-react";
+import { Eye, Search, Calendar, SlidersHorizontal, Plus, Briefcase } from "lucide-react";
 import toast from "react-hot-toast";
+import { getMyApplications } from "../api/applicationApi";
 
 const statusColors = {
-  pending: {
+  PENDING: {
     badge: "bg-amber-50 text-amber-800 border-amber-200",
     glow: "hover:border-amber-300",
     bg: "bg-amber-500",
   },
-  interview: {
+  INTERVIEW: {
     badge: "bg-blue-50 text-blue-800 border-blue-200",
     glow: "hover:border-blue-300",
     bg: "bg-blue-500",
   },
-  offer: {
+  OFFER: {
     badge: "bg-emerald-50 text-emerald-800 border-emerald-200",
     glow: "hover:border-emerald-300",
     bg: "bg-emerald-500",
   },
-  rejected: {
+  REJECTED: {
     badge: "bg-rose-50 text-rose-800 border-rose-200",
     glow: "hover:border-rose-300",
     bg: "bg-rose-500",
   },
 };
 
+
 const AllJob = () => {
-  const [applications, setApplications] = useState([]);
+  const {
+    data: applications = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["myApplications"],
+    queryFn: getMyApplications,
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
 
-  useEffect(() => {
-    const stored = localStorage.getItem("jobApplications");
-    if (stored) {
-      try {
-        setApplications(JSON.parse(stored));
-      } catch (e) {
-        console.error("Error parsing stored applications", e);
-      }
-    }
-  }, []);
 
-  const handleDelete = (id, e) => {
-    e.preventDefault(); // prevent navigation
-    if (window.confirm("Are you sure you want to delete this tracked application?")) {
-      const updated = applications.filter((app) => app.id !== id);
-      setApplications(updated);
-      localStorage.setItem("jobApplications", JSON.stringify(updated));
-      toast.success("Application removed from tracker!");
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Loading your applications...</p>
+      </div>
+    );
+  }
 
-  
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-500">
+          Failed to load your applications.
+        </p>
+      </div>
+    );
+  }
+
+
   const counts = {
     all: applications.length,
-    pending: applications.filter((app) => app.status === "pending").length,
-    interview: applications.filter((app) => app.status === "interview").length,
-    offer: applications.filter((app) => app.status === "offer").length,
-    rejected: applications.filter((app) => app.status === "rejected").length,
+    pending: applications.filter((app) => app.status === "PENDING").length,
+    interview: applications.filter((app) => app.status === "INTERVIEW").length,
+    offer: applications.filter((app) => app.status === "OFFER").length,
+    rejected: applications.filter((app) => app.status === "REJECTED").length,
   };
 
- 
+
   const filteredApps = applications.filter((app) => {
     const matchesSearch =
-      (app.role || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (app.company || "").toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTab = activeTab === "all" || app.status === activeTab;
+      (app.job?.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (app.job?.company || "").toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTab = activeTab === "all" || app.status === activeTab.toUpperCase();
     return matchesSearch && matchesTab;
   });
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 font-sans">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Header Block */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
           <div>
@@ -105,7 +113,7 @@ const AllJob = () => {
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 outline-none text-sm transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100"
               />
             </div>
-            
+
             <div className="flex items-center gap-1 text-gray-400 text-xs font-semibold uppercase tracking-wider">
               <SlidersHorizontal size={14} />
               <span>Filters</span>
@@ -120,17 +128,15 @@ const AllJob = () => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                    isActive
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${isActive
                       ? "bg-indigo-600 text-white shadow-sm"
                       : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-100"
-                  }`}
+                    }`}
                 >
                   <span className="capitalize">{tab}</span>
                   <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${
-                      isActive ? "bg-white/20 text-white" : "bg-gray-200 text-gray-700"
-                    }`}
+                    className={`text-xs px-2 py-0.5 rounded-full ${isActive ? "bg-white/20 text-white" : "bg-gray-200 text-gray-700"
+                      }`}
                   >
                     {counts[tab]}
                   </span>
@@ -161,30 +167,30 @@ const AllJob = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {filteredApps.map((app) => {
-              const styling = statusColors[app.status] || statusColors.pending;
+              const styling = statusColors[app.status] || statusColors.PENDING;
               return (
                 <div
                   key={app.id}
                   className={`bg-white shadow-sm border border-gray-100 rounded-2xl p-6 transition-all duration-300 hover:shadow-md ${styling.glow} relative flex flex-col justify-between`}
                 >
                   <div>
-                    {/* Top block */}
+                    
                     <div className="flex justify-between items-start gap-2 mb-3">
                       <div>
                         <h3 className="font-display font-bold text-gray-800 text-lg leading-snug">
-                          {app.role}
+                          {app.job?.title}
                         </h3>
-                        <p className="text-sm font-medium text-gray-500 mt-0.5">at {app.company}</p>
+                        <p className="text-sm font-medium text-gray-500 mt-0.5">at {app.job?.company}</p>
                       </div>
-                      
+
                       {/* Delete button */}
-                      <button
-                        onClick={(e) => handleDelete(app.id, e)}
+                      {/* <button
+                        onClick={(e) => handleDelete(app.job?.id, e)}
                         className="text-gray-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-colors"
                         title="Delete application"
                       >
                         <Trash2 size={16} />
-                      </button>
+                      </button> */}
                     </div>
 
                     {/* Status Badge */}
@@ -194,19 +200,15 @@ const AllJob = () => {
                       {app.status}
                     </span>
 
-                    {/* Notes preview */}
-                    {app.notes && (
-                      <p className="text-xs text-gray-500 line-clamp-2 italic mb-4 bg-gray-50 p-2.5 rounded-xl border border-gray-100/50">
-                        "{app.notes}"
-                      </p>
-                    )}
                   </div>
 
-                  {/* Date and CTA */}
+                  
                   <div className="border-t border-gray-50 pt-4 flex items-center justify-between text-xs text-gray-400">
                     <span className="inline-flex items-center gap-1.5">
                       <Calendar size={14} className="text-gray-400" />
-                      {app.dateApplied ? new Date(app.dateApplied).toLocaleDateString() : "Not specified"}
+                      {app.appliedAt
+                        ? new Date(app.appliedAt).toLocaleDateString()
+                        : "Not specified"}
                     </span>
 
                     <Link

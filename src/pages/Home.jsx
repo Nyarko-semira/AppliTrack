@@ -1,29 +1,27 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getJobs } from "../api/jobApi";
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { getJobs} from "../api/jobApi";
+import { getMyApplications } from "../api/applicationApi";
+import { Link , useParams} from "react-router-dom";
 import JobCard from "./JobCard";
 import { Briefcase, Layers, Plus, ArrowRight, Activity, Award, BookmarkCheck } from "lucide-react";
 
 const Home = () => {
+
+   const { id } = useParams();
+
   const { data: jobs = [], isLoading, isError, } = useQuery({
     queryKey: ["jobs"],
     queryFn: getJobs,
   });
 
-  const [trackedCount, setTrackedCount] = useState(0);
+const { data: application = [] } = useQuery({
+  queryKey: ["myApplications"],
+  queryFn: getMyApplications,
+});
 
-  useEffect(() => {
-    const stored = localStorage.getItem("jobApplications");
-    if (stored) {
-      try {
-        setTrackedCount(JSON.parse(stored).length);
-      } catch (e) {
-        console.error("Error parsing job applications", e);
-      }
-    }
-  }, []);
+
+
 
   if (isLoading) {
     return <div>Loading jobs...</div>;
@@ -94,7 +92,7 @@ const Home = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-400 uppercase tracking-wider">Your Tracked Apps</p>
-                <h3 className="text-3xl font-display font-bold text-gray-800 mt-1">{trackedCount}</h3>
+                <h3 className="text-3xl font-display font-bold text-gray-800 mt-1">{application.length}</h3>
               </div>
             </div>
             <Link to="/all-jobs" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 group">

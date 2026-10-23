@@ -30,3 +30,9 @@ export const getMyApplications = async () => {
 
   return response.data.applications;
 };
+
+export const getApplicationById = async (id) => {
+  const response = await api.get(`/applications/${id}`);
+
+  return response.data.application;
+};
